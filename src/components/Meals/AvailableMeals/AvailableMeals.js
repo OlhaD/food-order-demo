@@ -2,6 +2,7 @@ import React from "react";
 import classes from "./AvailableMeals.module.scss";
 import MealItem from "./MealItem/MealItem";
 import Card from "../../UI/Card/Card";
+import CartProvider from "../../../store/CartProvider";
 
 const DUMMY_MEALS = [
   {
@@ -38,7 +39,9 @@ const AvailableMeals = () => {
   return (
     <section className={classes.meals}>
       <Card>
-        <ul>{mealsList}</ul>
+        <CartProvider>
+          <ul>{mealsList}</ul>
+        </CartProvider>
       </Card>
     </section>
   );
