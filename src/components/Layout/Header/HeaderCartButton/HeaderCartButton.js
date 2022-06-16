@@ -3,7 +3,6 @@ import CartIcon from "../../../Cart/CartIcon/CartIcon";
 import Cart from "../../../Cart/Cart";
 import classes from "./HeaderCartButton.module.scss";
 import CartContext from "../../../../store/cart-context";
-import CartProvider from "../../../../store/CartProvider";
 
 const HeaderCartButton = () => {
   const cartContext = useContext(CartContext);
@@ -20,12 +19,10 @@ const HeaderCartButton = () => {
           <CartIcon />
         </span>
         <span>Your Cart</span>
-        <span className={classes.badge}>{cartContext.totalAmount}</span>
+        <span className={classes.badge}>{cartContext.total}</span>
       </button>
 
-      <CartProvider>
-        {isCartOpened && <Cart cartClick={cartClickHandler} />}
-      </CartProvider>
+      {isCartOpened && <Cart cartClick={cartClickHandler} />}
     </>
   );
 };

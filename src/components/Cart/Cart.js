@@ -7,8 +7,8 @@ import CartItem from "./CartItem/CartItem";
 const Cart = (props) => {
   const cartContext = useContext(CartContext);
   const cartItems = cartContext.items;
-
-  if(!cartItems) {
+  
+  if(cartContext.totalAmount === 0) {
     return <Modal onClose={props.cartClick}>Cart is empty!</Modal>
   }
 
@@ -21,7 +21,7 @@ const Cart = (props) => {
       </ul>
       <div className={classes.total}>
         <span>Total Amount</span>
-        <span>$33.34</span>
+        <span>${cartContext.totalAmount.toFixed(2)}</span>
       </div>
       <div className={classes.actions}>
         <button className={classes["button--alt"]} onClick={props.cartClick}>Close</button>
