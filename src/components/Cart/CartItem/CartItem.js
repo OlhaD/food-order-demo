@@ -2,8 +2,8 @@ import React from "react";
 import classes from "./CartItem.module.scss";
 
 const CartItem = (props) => {
-    const price = `$${props.price.toFixed(2)}`;
-    const amount = "x" + props.amount;
+  const price = `$${props.price.toFixed(2)}`;
+  const amount = "x" + props.amount;
 
   return (
     <li className={classes["cart-item"]}>
@@ -15,8 +15,8 @@ const CartItem = (props) => {
         </div>
       </div>
       <div className={classes.actions}>
-        <button>-</button>
-        <button>+</button>
+        <button onClick={props.onRemove}>-</button>
+        <button onClick={props.onAdd}>+</button>
       </div>
     </li>
   );
