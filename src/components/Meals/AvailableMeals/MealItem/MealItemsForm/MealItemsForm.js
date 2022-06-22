@@ -5,6 +5,10 @@ import classes from "./MealItemsForm.module.scss";
 const MealItemsForm = (props) => {
   const meal = props.meal;
   const [amount, setAmount] = useState(1);
+  const validationRules = {
+    min: 1,
+    max: 5,
+  };
 
   const addMeal = (event) => {
     event.preventDefault();
@@ -13,7 +17,17 @@ const MealItemsForm = (props) => {
   };
 
   const changeAmountHandler = (event) => {
-    setAmount(event.target.value);
+    const newAmount = event.target.value;
+    if (!isAmountValid(newAmount)) return;
+    setAmount(newAmount);
+  };
+
+  const isAmountValid = (amount) => {
+    return (
+      amount.trim().length > 0 &&
+      amount >= validationRules.min &&
+      amount <= validationRules.max
+    );
   };
 
   return (
@@ -23,8 +37,8 @@ const MealItemsForm = (props) => {
         input={{
           id: "amount_" + meal.id,
           type: "number",
-          min: 1,
-          max: 5,
+          min: validationRules.min,
+          max: validationRules.max,
           step: 1,
           value: amount,
           onChange: changeAmountHandler,
