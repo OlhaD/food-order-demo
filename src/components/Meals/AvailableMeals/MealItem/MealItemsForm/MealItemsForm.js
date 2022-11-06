@@ -21,7 +21,7 @@ const MealItemsForm = (props) => {
     if (!isAmountValid(newAmount)) return;
     setAmount(newAmount);
   };
-
+ 
   const isAmountValid = (amount) => {
     return (
       amount.trim().length > 0 &&
