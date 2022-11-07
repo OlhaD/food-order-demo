@@ -1,45 +1,59 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import classes from "./AvailableMeals.module.scss";
 import MealItem from "./MealItem/MealItem";
 import Card from "../../UI/Card/Card";
 
-const DUMMY_MEALS = [
-  {
-    id: "m1",
-    name: "Sushi",
-    description: "Finest fish and veggies",
-    price: 22.99,
-  },
-  {
-    id: "m2",
-    name: "Schnitzel",
-    description: "A german specialty!",
-    price: 16.5,
-  },
-  {
-    id: "m3",
-    name: "Barbecue Burger",
-    description: "American, raw, meaty",
-    price: 12.99,
-  },
-  {
-    id: "m4",
-    name: "Green Bowl",
-    description: "Healthy...and green...",
-    price: 18.99,
-  },
-];
-
 const AvailableMeals = () => {
-  const mealsList = DUMMY_MEALS.map((meal) => (
-    <MealItem key={meal.id} meal={meal} />
-  ));
+  const [meals, setMeals] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    const fetchMeals = async () => {
+      setIsLoading(true);
+
+      const response = await fetch(
+        "https://food-order-demo-b1e6f-default-rtdb.firebaseio.com/meals.json"
+      );
+
+      if (!response.ok) {
+        throw new Error("Something went wrong..");
+      }
+
+      const data = await response.json();
+      const loadedMeals = [];
+      for (const key in data) {
+        loadedMeals.push({
+          id: key,
+          name: data[key].name,
+          description: data[key].description,
+          price: data[key].price,
+        });
+      }
+      setMeals(loadedMeals);
+
+      setIsLoading(false);
+    };
+
+    fetchMeals().catch((error) => {
+      setError(error.message);
+    });
+  }, [setIsLoading]);
+
+  const mealsList = meals.map((meal) => <MealItem key={meal.id} meal={meal} />);
+
+  if (error) {
+    return <section>{error}</section>;
+  }
 
   return (
     <section className={classes.meals}>
-      <Card>
-        <ul>{mealsList}</ul>
-      </Card>
+      {!isLoading && (
+        <Card>
+          <ul>{mealsList}</ul>
+        </Card>
+      )}
+      {isLoading && <p>Loading..</p>}
     </section>
   );
 };
