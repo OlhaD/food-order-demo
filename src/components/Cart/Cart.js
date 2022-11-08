@@ -7,8 +7,11 @@ import CheckoutForm from "./CheckoutForm/CheckoutForm";
 
 const Cart = (props) => {
   const cartContext = useContext(CartContext);
-  const cartItems = cartContext.items;
   const [isCheckout, setIsCheckout] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [didSubmit, setDidSubmit] = useState(false);
+
+  const totalAmount = `$${cartContext.totalAmount.toFixed(2)}`;
 
   if (cartContext.totalAmount === 0) {
     return <Modal onClose={props.cartClick}>Cart is empty!</Modal>;
@@ -29,13 +32,44 @@ const Cart = (props) => {
     setIsCheckout(true);
   };
 
-  const confirmCheckoutHandler = () => {
-    setIsCheckout(false);
+  const confirmCheckoutHandler = async (userData) => {
+    setIsSubmitting(true);
+    await fetch(
+      "https://food-order-demo-b1e6f-default-rtdb.firebaseio.com/orders.json",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          user: userData,
+          orderedItems: cartContext.items,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    setIsSubmitting(false);
+    setDidSubmit(true);
+    cartContext.clearCart();
   };
 
   const cancelCheckoutHandler = () => {
     setIsCheckout(false);
   };
+
+  const cartItems = (
+    <ul className={classes["cart-items"]}>
+      {cartContext.items.map((item) => (
+        <CartItem
+          key={item.id}
+          name={item.name}
+          amount={item.amount}
+          price={item.price}
+          onRemove={cartRemoveHandler.bind(null, item.id)}
+          onAdd={cartAddHandler.bind(null, item)}
+        />
+      ))}
+    </ul>
+  );
 
   const modalActions = (
     <div className={classes.actions}>
@@ -48,31 +82,41 @@ const Cart = (props) => {
     </div>
   );
 
-  return (
-    <Modal onClose={props.cartClick}>
-      <ul className="cart-items">
-        {cartItems.map((item) => (
-          <CartItem
-            key={item.id}
-            name={item.name}
-            price={item.price}
-            amount={item.amount}
-            onAdd={cartAddHandler.bind(null, item)}
-            onRemove={cartRemoveHandler.bind(null, item.id)}
-          />
-        ))}
-      </ul>
+  const cartModalContent = (
+    <React.Fragment>
+      {cartItems}
       <div className={classes.total}>
         <span>Total Amount</span>
-        <span>${cartContext.totalAmount.toFixed(2)}</span>
+        <span>{totalAmount}</span>
       </div>
       {isCheckout && (
         <CheckoutForm
           onCheckout={confirmCheckoutHandler}
           onCancel={cancelCheckoutHandler}
-        ></CheckoutForm>
+        />
       )}
       {!isCheckout && modalActions}
+    </React.Fragment>
+  );
+
+  const isSubmittingModalContent = <p>Sending order data...</p>;
+
+  const didSubmitModalContent = (
+    <React.Fragment>
+      <p>Successfully sent the order!</p>
+      <div className={classes.actions}>
+        <button className={classes.button} onClick={props.onClose}>
+          Close
+        </button>
+      </div>
+    </React.Fragment>
+  );
+
+  return (
+    <Modal onClose={props.onClose}>
+      {!isSubmitting && !didSubmit && cartModalContent}
+      {isSubmitting && isSubmittingModalContent}
+      {!isSubmitting && didSubmit && didSubmitModalContent}
     </Modal>
   );
 };
